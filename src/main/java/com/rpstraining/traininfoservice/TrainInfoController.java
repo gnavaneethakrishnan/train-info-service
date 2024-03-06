@@ -4,10 +4,7 @@ package com.rpstraining.traininfoservice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
@@ -26,12 +23,18 @@ public class TrainInfoController {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private TrainDetailsRepository trainDetailsRepository;
+
 
     @RequestMapping("/{trainID}")
     public ResponseEntity<TrainDetails> getTrainDetails(@PathVariable("trainID") Integer trainID) {
-        TrainDetails train = trainList.stream().filter(trainDetails -> trainDetails.getTrainID().equals(trainID))
-                .findFirst()
-                .orElseThrow(null);
+//        TrainDetails train = trainList.stream().filter(trainDetails -> trainDetails.getTrainID().equals(trainID))
+//                .findFirst()
+//                .orElseThrow(null);
+
+        TrainDetails  train = trainDetailsRepository.findById(trainID)
+                .orElseThrow(() -> new RuntimeException("Train Details not found"));
 
         return new ResponseEntity<>(train, HttpStatus.OK);
     };
@@ -50,5 +53,11 @@ public class TrainInfoController {
 
         return new ResponseEntity<>(combinedDetails, HttpStatus.OK);
 
+    }
+
+    @PostMapping("/newTrain")
+    public ResponseEntity<TrainDetails> createStationDetails(@RequestBody TrainDetails trainDetails) {
+        TrainDetails newStationDetails = trainDetailsRepository.save(trainDetails);
+        return new ResponseEntity<>(newStationDetails, HttpStatus.CREATED);
     }
 }

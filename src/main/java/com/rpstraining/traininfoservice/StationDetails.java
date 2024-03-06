@@ -1,5 +1,6 @@
 package com.rpstraining.traininfoservice;
 
+
 public class StationDetails {
 
 
